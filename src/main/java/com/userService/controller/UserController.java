@@ -3,6 +3,7 @@ package com.userService.controller;
 
 import com.userService.dto.UserRequest;
 import com.userService.dto.UserResponse;
+import com.userService.dto.UserWithRatingResponse;
 import com.userService.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,47 +20,14 @@ import java.util.Map;
 @RequestMapping("/api/users")
 public class UserController {
 
-//    @Autowired
-//    private UserService userService;
-
     private final UserService userService;
 
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    // Get all users
-    @GetMapping
-    public ResponseEntity<?> getAllUsers() {
-
-        List<UserResponse> users = userService.getAllUsers();
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of(
-                        "data", users,
-                        "status", HttpStatus.OK,
-                        "timestamp", LocalDateTime.now()
-                ));
-    }
-
-
-    // Get user by ID
-    @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable String userId) {
-
-        UserResponse user = userService.getUserById(userId);
-
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of(
-                        "data", user,
-                        "status", HttpStatus.OK,
-                        "timestamp", LocalDateTime.now()
-                ));
-    }
-
-
     // Create new user
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody UserRequest request) {
 
         UserResponse createdUser = userService.createUser(request);
@@ -72,6 +40,34 @@ public class UserController {
                 ));
     }
 
+    // Get all users
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers() {
+
+        List<UserResponse> users = userService.getAllUsers();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of(
+                        "data", users,
+                        "status", HttpStatus.OK,
+                        "timestamp", LocalDateTime.now()
+                ));
+    }
+
+    // Get user by ID
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUserById(@PathVariable String userId) {
+
+        //UserResponse user = userService.getUserById(userId);
+        UserWithRatingResponse userWithRatings = userService.getUserWithRatings(userId);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of(
+                        "data", userWithRatings,
+                        "status", HttpStatus.OK,
+                        "timestamp", LocalDateTime.now()
+                ));
+    }
 
     // Update user
     @PutMapping("/{userId}")
@@ -103,13 +99,4 @@ public class UserController {
                         "timestamp", LocalDateTime.now()
                 ));
     }
-
-
-
-
-
-
-
-
-
 }
