@@ -4,8 +4,10 @@ import com.userService.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.ApplicationContext;
 
+@EnableFeignClients
 @SpringBootApplication
 @EnableDiscoveryClient
 public class A1UserServiceApplication {
@@ -14,9 +16,9 @@ public class A1UserServiceApplication {
 		ApplicationContext context = SpringApplication.run(A1UserServiceApplication.class, args);
         System.out.println("user service up...");
 
-        UserService userService = context.getBean(UserService.class);
-
-        userService.getUserWithRatings("3d874127-808c-4163-ba74-69270aed2d96");
+//        UserService userService = context.getBean(UserService.class);
+//
+//        userService.getUserWithRatings("3d874127-808c-4163-ba74-69270aed2d96");
 
     }
 

@@ -18,22 +18,25 @@ import java.util.UUID;
 @Service
 public class UserService {
 
-	@Autowired
 	private final UserRepository userRepository;
 
-    @Autowired
     private final ModelMapper modelMapper;
 
-    @Autowired
 	private final RestTemplate restTemplate;
 
     private final String RATING_SERVICE_URL = "http://localhost:9093/api/ratings";
 
+//    private final String RATING_SERVICE_URL = "http://A3_RATINGSERVICE/api/ratings";
 
-    public UserService(ModelMapper modelMapper, UserRepository userRepository, RestTemplate restTemplate) {
+    private final RatingServiceClient ratingServiceClient;
+
+    public UserService(ModelMapper modelMapper, UserRepository userRepository, RestTemplate restTemplate,
+                       RatingServiceClient ratingServiceClient
+    ) {
         this.restTemplate = restTemplate;
         this.modelMapper = modelMapper;
         this.userRepository = userRepository;
+        this.ratingServiceClient = ratingServiceClient;
     }
 
 
@@ -84,18 +87,14 @@ public class UserService {
        // System.out.println("user details: " + userResponse.getUserId() + ", " + userResponse.getUserName() + ", " + userResponse.getUserEmail());
 
         // Fetch ratings for the user from Rating Service
-        ResponseEntity<RatingApiResponse> ratingApiResponse = restTemplate.getForEntity(
-                RATING_SERVICE_URL + "/by-user/" + userResponse.getUserId(),
-                RatingApiResponse.class);
-        System.out.println("=============================");
+//        ResponseEntity<RatingApiResponse> ratingApiResponse = restTemplate.getForEntity(
+//                RATING_SERVICE_URL + "/by-user/" + userResponse.getUserId(),
+//                RatingApiResponse.class);
+
+        //from feign client
+        ResponseEntity<RatingApiResponse> ratingApiResponse = ratingServiceClient.getRatingsByUser(userResponse.getUserId());
+
         List<RatingResponse> ratingResponses = ratingApiResponse.getBody().getData();
-//        ratingResponses.forEach(rating -> {
-//            System.out.println("Rating ID: " + rating.getRatingId());
-//            System.out.println("Hotel ID: " + rating.getHotelId());
-//            System.out.println("Rating: " + rating.getRating());
-//            System.out.println("Feedback: " + rating.getFeedback());
-//            System.out.println("-----------------------------");
-//        });
 
         UserWithRatingResponse userWithRatingResponse = new UserWithRatingResponse();
         userWithRatingResponse.setUserId(userResponse.getUserId());
