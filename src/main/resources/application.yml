@@ -1,23 +1,33 @@
-server:
-  port: 9091
+#All the configurations related to this microservice will be placed here,
+#  and if we want to override any configuration from config server,
+#we can do it here as well, because the configurations in this file will take precedence over the configurations from config server.
+
+#all the configurations are placed at config server repo and form there we are fetching at spring config server project, then via that project we are importing here.
+#server:
+#  port: 9091
+
+#all the configuration of user-service are place in congig server repo now.
 
 spring:
   application:
      name: A1-USERSERVICE
-  datasource:
-    url: jdbc:mysql://localhost:3306/microservices_db
-    username: root
-    password: system@1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-   database-platform: org.hibernate.dialect.MySQLDialect
-   hibernate:
-      ddl-auto: update
-   show-sql: true
+  profiles:
+    active: dev
   config:
     import: optional:configserver:http://localhost:9095  # from config server all configurations will be imported,
     #and if config server is not available,
     #it will not throw an error because of optional
+
+#  datasource:
+#      url: jdbc:mysql://localhost:3306/microservices_db
+#      username: root
+#      password: system@1234
+#      driver-class-name: com.mysql.cj.jdbc.Driver
+#  jpa:
+#     database-platform: org.hibernate.dialect.MySQLDialect
+#     hibernate:
+#       ddl-auto: update
+#     show-sql: true
 
 
 #this also can be used to expose the actuator endpoints, but we have already exposed them in config server, so no need to do it here
