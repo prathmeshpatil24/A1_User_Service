@@ -4,6 +4,8 @@ import com.userService.dto.*;
 import com.userService.entity.UserDetails;
 import com.userService.exception.ResourceNotFoundException;
 import com.userService.repository.UserRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +82,8 @@ public class UserService {
     }
 
     //user with ratings-service data
+    @Retry(name = "userWithRatingRetry")
+    @CircuitBreaker(name = "userWithRatingsCB", fallbackMethod = "getUserWithRatingsFallback")
     public UserWithRatingResponse getUserWithRatings(String userId) {
 
         UserResponse userResponse = getUserById(userId);
@@ -102,11 +106,29 @@ public class UserService {
         userWithRatingResponse.setUserEmail(userResponse.getUserEmail());
         userWithRatingResponse.setAbout(userResponse.getAbout());
         userWithRatingResponse.setRatings(ratingResponses);
+        userWithRatingResponse.setRatingServiceAvailable(true);
 
         return userWithRatingResponse;
 
     }
 
+    // Fallback method for getUserWithRatings method
+    public UserWithRatingResponse getUserWithRatingsFallback(String userId, Exception ex) {
+
+        UserResponse userResponse = getUserById(userId);
+
+        UserWithRatingResponse userWithRatingResponse = new UserWithRatingResponse();
+        userWithRatingResponse.setUserId(userResponse.getUserId());
+        userWithRatingResponse.setUserName(userResponse.getUserName());
+        userWithRatingResponse.setUserEmail(userResponse.getUserEmail());
+        userWithRatingResponse.setAbout(userResponse.getAbout());
+        userWithRatingResponse.setRatings(Arrays.asList()); // Return empty ratings list in case of failure
+
+        //for faling the rating service, we are just printing the exception message and returning the user details with empty ratings list and ratingServiceAvailable as false
+        userWithRatingResponse.setRatingServiceAvailable(false);
+        System.out.println("Exception:- " + ex.getMessage());
+        return userWithRatingResponse;
+    }
 
     // Create new user
     public UserResponse createUser(UserRequest request) {

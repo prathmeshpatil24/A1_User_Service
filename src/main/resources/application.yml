@@ -29,6 +29,30 @@ spring:
 #       ddl-auto: update
 #     show-sql: true
 
+resilience4j:
+  # Automatically re-hit the api when service is temporarily down, and it will try to hit the api for 3 times with a wait duration of 2 seconds between each attempt.
+  retry:
+    instances:
+      userWithRatingRetry:
+        max-attempts: 5
+        wait-duration: 2s
+        
+  circuitbreaker:
+    instances:
+      userWithRatingsCB:
+        registerHealthIndicator: true # this will connected to actuator health via this url we can check it /actuator/health
+        slidingWindowSize: 5 # this is the number of calls that will be considered for calculating the failure rate. If we set it to 5, then the circuit breaker will consider the last 5 calls to calculate the failure rate.
+        failureRateThreshold: 50 # this is the percentage of failed calls that will cause the circuit breaker to open. If we set it to 50, then if 50% or more of the calls fail, the circuit breaker will open.
+#        Since 60% > 50% → Circuit opens
+        waitDurationInOpenState: 10s # this is the duration for which the circuit breaker will remain open before it tries to half-open again. If we set it to 10s, then after 10 seconds, the circuit breaker will try to half-open and allow a few calls to pass through to check if the service has recovered.
+#  Once circuit becomes OPEN, it will: ⛔ Block all requests ⏳ Wait for 10 seconds
+  timelimiter:
+    instances:
+      userWithRatingsCB:
+        timeout-duration: 5s
+
+
+
 
 #this also can be used to expose the actuator endpoints, but we have already exposed them in config server, so no need to do it here
 #management:

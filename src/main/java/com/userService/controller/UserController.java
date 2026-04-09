@@ -59,13 +59,18 @@ public class UserController {
     public ResponseEntity<?> getUserById(@PathVariable String userId) {
 
         //UserResponse user = userService.getUserById(userId);
+
+        //user with ratings-service data
         UserWithRatingResponse userWithRatings = userService.getUserWithRatings(userId);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of(
                         "data", userWithRatings,
                         "status", HttpStatus.OK,
-                        "timestamp", LocalDateTime.now()
+                        "timestamp", LocalDateTime.now(),
+                        "message", userWithRatings.isRatingServiceAvailable()
+                                ? "Ratings service is available"
+                                : "Ratings service is not available, please try later!"
                 ));
     }
 

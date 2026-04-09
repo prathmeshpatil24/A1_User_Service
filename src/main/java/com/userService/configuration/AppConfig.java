@@ -16,6 +16,11 @@ public class AppConfig {
     }
 
     @Bean
+    public feign.Retryer feignRetryer() {
+        return feign.Retryer.NEVER_RETRY;
+    }
+
+    @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }

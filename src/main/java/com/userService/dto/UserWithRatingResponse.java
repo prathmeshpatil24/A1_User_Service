@@ -13,5 +13,5 @@ public class UserWithRatingResponse {
     private String userEmail;
     private String about;
     private List<RatingResponse> ratings = new ArrayList<>();
-
+    private boolean ratingServiceAvailable;
 }
